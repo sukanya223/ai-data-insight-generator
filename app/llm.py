@@ -1,30 +1,20 @@
-from openai import OpenAI
-import streamlit as st
-from openai import OpenAI
-
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
 def generate_pandas_code(question, columns):
-    prompt = f"""
-You are a data analyst.
+    question = question.lower()
 
-Given a pandas dataframe named df with columns: {columns}
+    if "total sales by product" in question:
+        return "result = df.groupby('product')['sales'].sum()"
 
-Convert the user's question into pandas code.
+    elif "sales by region" in question:
+        return "result = df.groupby('region')['sales'].sum()"
 
-IMPORTANT:
-- Store final answer in variable called result
-- Only return python code
-- Do not explain anything
+    elif "average sales" in question:
+        return "result = df['sales'].mean()"
 
-Question: {question}
-"""
+    elif "top product" in question:
+        return "result = df.groupby('product')['sales'].sum().sort_values(ascending=False).head(1)"
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
-    )
+    elif "count" in question:
+        return "result = df.count()"
 
-    code = response.choices[0].message.content
-    code = code.replace("```python", "").replace("```", "")
-    return code
+    else:
+        return "result = df.head()"
