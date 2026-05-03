@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from app.llm import generate_pandas_code
-from app.utils import execute_code
+from llm import generate_pandas_code
+from utils import execute_code
 
 st.set_page_config(page_title="AI Data Insight Generator")
 
