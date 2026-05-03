@@ -18,11 +18,11 @@ if file is not None:
         st.error("Invalid or empty CSV file. Please upload a valid dataset.")
         st.stop()
 
-    # ✅ DATA PREVIEW
+    # 📊 Data Preview
     st.subheader("Data Preview")
     st.dataframe(df.head())
 
-    # ✅ KPI CARDS (ADD HERE)
+    # 📊 KPI Cards
     st.subheader("📊 Key Metrics")
 
     col1, col2, col3 = st.columns(3)
@@ -36,7 +36,7 @@ if file is not None:
         col2.metric("Columns", len(df.columns))
         col3.metric("Non-null values", df.count().sum())
 
-    # ✅ USER QUERY
+    # 🔍 Query Input
     query = st.text_input("Ask your question")
 
     if query:
@@ -53,7 +53,7 @@ if file is not None:
             st.subheader("Result")
             st.write(result)
 
-            # Plot if possible
+            # 📊 Plot (if possible)
             try:
                 if hasattr(result, "plot"):
                     result.plot(kind="bar")
@@ -61,7 +61,27 @@ if file is not None:
             except:
                 pass
 
-            # ✅ SMART INSIGHTS
+            # ⭐ Convert result to DataFrame for download
+            if isinstance(result, pd.Series):
+                result_df = result.reset_index()
+            elif isinstance(result, pd.DataFrame):
+                result_df = result
+            else:
+                result_df = pd.DataFrame({"Result": [result]})
+
+            # ⭐ Download Button
+            csv = result_df.to_csv(index=False).encode('utf-8')
+
+            st.download_button(
+                label="📥 Download Report",
+                data=csv,
+                file_name="analysis_report.csv",
+                mime="text/csv"
+            )
+
+            st.success("Report ready for download 🚀")
+
+            # 📊 Smart Insights
             st.subheader("📊 Insight")
 
             if "sales" in query.lower() and "sales" in df.columns:
@@ -78,7 +98,7 @@ if file is not None:
             else:
                 st.write("Basic data trends observed from dataset.")
 
-            # ✅ EXPLAIN BUTTON (bonus feature)
+            # 🔥 Explain Button
             if st.button("Explain Result"):
                 st.write("This result shows patterns and trends extracted from your dataset for decision-making.")
 
