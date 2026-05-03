@@ -24,7 +24,6 @@ if file is not None:
 
     # 📊 KPI Cards
     st.subheader("📊 Key Metrics")
-
     col1, col2, col3 = st.columns(3)
 
     col1.metric("Total Rows", len(df))
@@ -35,6 +34,26 @@ if file is not None:
     else:
         col2.metric("Columns", len(df.columns))
         col3.metric("Non-null values", df.count().sum())
+
+    # ⭐ Top Insights (NEW FEATURE)
+    st.subheader("💡 Top Insights")
+
+    insights = []
+
+    if "sales" in df.columns:
+        total_sales = df["sales"].sum()
+        insights.append(f"Total sales across dataset is {total_sales}")
+
+    if "product" in df.columns and "sales" in df.columns:
+        top_product = df.groupby("product")["sales"].sum().idxmax()
+        insights.append(f"Product {top_product} is the top performer")
+
+    if "region" in df.columns and "sales" in df.columns:
+        top_region = df.groupby("region")["sales"].sum().idxmax()
+        insights.append(f"Region {top_region} contributes highest sales")
+
+    for insight in insights[:3]:
+        st.write("💡 " + insight)
 
     # 🔍 Query Input
     query = st.text_input("Ask your question")
@@ -61,7 +80,7 @@ if file is not None:
             except:
                 pass
 
-            # ⭐ Convert result to DataFrame for download
+            # ⭐ Convert result for download
             if isinstance(result, pd.Series):
                 result_df = result.reset_index()
             elif isinstance(result, pd.DataFrame):
@@ -69,7 +88,6 @@ if file is not None:
             else:
                 result_df = pd.DataFrame({"Result": [result]})
 
-            # ⭐ Download Button
             csv = result_df.to_csv(index=False).encode('utf-8')
 
             st.download_button(
@@ -81,7 +99,7 @@ if file is not None:
 
             st.success("Report ready for download 🚀")
 
-            # 📊 Smart Insights
+            # 📊 Smart Insight
             st.subheader("📊 Insight")
 
             if "sales" in query.lower() and "sales" in df.columns:
