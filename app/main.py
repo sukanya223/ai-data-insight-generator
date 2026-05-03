@@ -18,15 +18,32 @@ if file is not None:
         st.error("Invalid or empty CSV file. Please upload a valid dataset.")
         st.stop()
 
+    # ✅ DATA PREVIEW
     st.subheader("Data Preview")
     st.dataframe(df.head())
 
+    # ✅ KPI CARDS (ADD HERE)
+    st.subheader("📊 Key Metrics")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Total Rows", len(df))
+
+    if "sales" in df.columns:
+        col2.metric("Total Sales", int(df["sales"].sum()))
+        col3.metric("Average Sales", round(df["sales"].mean(), 2))
+    else:
+        col2.metric("Columns", len(df.columns))
+        col3.metric("Non-null values", df.count().sum())
+
+    # ✅ USER QUERY
     query = st.text_input("Ask your question")
 
     if query:
         try:
-            # Generate code
+            # Generate pandas code
             code = generate_pandas_code(query, df.columns.tolist())
+
             st.subheader("Generated Code")
             st.code(code, language="python")
 
@@ -44,17 +61,26 @@ if file is not None:
             except:
                 pass
 
-            # Insight Section
+            # ✅ SMART INSIGHTS
             st.subheader("📊 Insight")
 
-            if "sales" in query.lower():
-                st.write("Sales distribution analyzed successfully.")
-            elif "product" in query.lower():
-                st.write("Top performing products identified based on sales.")
-            elif "region" in query.lower():
-                st.write("Regional performance comparison generated.")
+            if "sales" in query.lower() and "sales" in df.columns:
+                st.write(f"Total sales is {df['sales'].sum()}, indicating overall performance.")
+
+            elif "product" in query.lower() and "sales" in df.columns:
+                top_product = df.groupby("product")["sales"].sum().idxmax()
+                st.write(f"Product {top_product} is the top performer based on sales.")
+
+            elif "region" in query.lower() and "sales" in df.columns:
+                top_region = df.groupby("region")["sales"].sum().idxmax()
+                st.write(f"Region {top_region} contributes the highest sales.")
+
             else:
-                st.write("Basic data analysis generated.")
+                st.write("Basic data trends observed from dataset.")
+
+            # ✅ EXPLAIN BUTTON (bonus feature)
+            if st.button("Explain Result"):
+                st.write("This result shows patterns and trends extracted from your dataset for decision-making.")
 
         except Exception as e:
             st.error("Error occurred:")
