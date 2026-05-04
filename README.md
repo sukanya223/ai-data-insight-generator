@@ -26,6 +26,7 @@ This project simulates a real-world AI analytics assistant using a hybrid rule-b
 -  Downloadable Reports (CSV)
 -  Explain Results Feature
 -  Clean and interactive UI (Streamlit-based)
+-   Implemented Retrieval-Augmented Generation (RAG) for context-aware analytics
 
 ---
 
